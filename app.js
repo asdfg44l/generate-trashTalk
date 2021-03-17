@@ -1,7 +1,11 @@
 const express = require('express')
 const exphbs = require('express-handlebars')
+const hbsHelper = require('./helpers')
 const app = express()
 const bodyParser = require('body-parser')
+
+//genearte trashTalk
+const generateTrashTalk = require('./generateTrashTalk')
 
 //data
 const profession = require('./config/professionForm.json').profession
@@ -10,7 +14,7 @@ const profession = require('./config/professionForm.json').profession
 const PORT = 8080
 
 //set view engine
-app.engine('hbs', exphbs({ defaultLayout: 'main', extname: 'hbs' }))
+app.engine('hbs', exphbs({ defaultLayout: 'main', extname: 'hbs', helpers: hbsHelper }))
 app.set('view engine', 'hbs')
 
 //set public
@@ -21,13 +25,13 @@ app.use(bodyParser.urlencoded({ extended: true }))
 
 //route
 app.get('/', (req, res) => {
-    res.render('index')
+    res.render('index', { profession })
 })
 
 app.post('/', (req, res) => {
-    const trashTalk = req.body
-    console.log(trashTalk)
-    res.render('index', { profession })
+    const options = req.body
+    const trashTalk = generateTrashTalk(options)
+    res.render('index', { profession, trashTalk, options })
 })
 
 //listen
